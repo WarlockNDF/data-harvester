@@ -26,7 +26,6 @@ if __name__ == '__main__':
     load_dotenv()
     storage: Storage = Storage("harvest").with_local()
     harvester: Harvester = Harvester().define_storage(storage)
-    harvester.define_mqtt(get_mqtt_config())
-    harvester.connect()
+    harvester.define_mqtt(get_mqtt_config()).connect()
     harvester.define_log_sub("test", extractor_key= "hello.world.foo")
     harvester.run()
