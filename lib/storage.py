@@ -26,6 +26,7 @@ class Storage:
 
     def upload(self, file_name: str, data: bytes):
         if self.__is_object_storage:
+            if self.__minio is None: raise Exception("Minio Instance is not initialized")
             self.__minio_upload(file_name, data)
         else:
             self.__local_upload(file_name, data)
