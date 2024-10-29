@@ -30,4 +30,3 @@ if __name__ == '__main__':
     harvester.connect()
     harvester.define_log_sub("test", extractor_key= "hello.world.foo")
     harvester.run()
-

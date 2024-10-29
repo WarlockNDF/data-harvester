@@ -1,9 +1,9 @@
 from typing import Self
 
+import io
 from minio import Minio
 
 from lib.config.minio_config import MinioConfig
-
 
 class Storage:
 
@@ -26,9 +26,25 @@ class Storage:
 
     def upload(self, file_name: str, data: bytes):
         if self.__is_object_storage:
-            pass
+            self.__minio_upload(file_name, data)
         else:
-            pass
+            self.__local_upload(file_name, data)
 
-    def __minio__upload(self, file_name: str, data: bytes):
-        pass
+    def __minio_upload(self, file_name: str, data: bytes):
+        self.__minio_bucket_prep()
+        byte_stream = io.BytesIO(data)
+        self.__minio.put_object(self.__bucket, file_name, byte_stream, length=len(data))
+
+    def __minio_bucket_prep(self):
+        exist = self.__minio.bucket_exists(self.__bucket)
+        if not exist:
+            self.__minio.make_bucket(self.__bucket)
+            print("Creating Bucket : " + self.__bucket)
+        else:
+            print("Using Bucket : " + self.__bucket)
+
+    def __local_upload(self, file_name: str, data: bytes):
+        file_path = f"./${self.__bucket}/{file_name}"
+        bytes_stream = io.BytesIO(data)
+        with open(file_path, "wb") as f:
+            f.write(bytes_stream.getbuffer())
