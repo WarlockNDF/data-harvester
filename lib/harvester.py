@@ -35,10 +35,11 @@ class Harvester:
     def define_image_sub(self, topic: str, extractor_key: str):
         pass
 
-    def define_log_sub(self, topic: str, extractor_key: str = None):
+    def define_log_sub(self, topic: str, extractor_key: str = None) ->  Self:
         if not self.__connected: raise Exception("MQTT not connected");
         self.__mqtt.subscribe(topic, qos=1)
         self.__mqtt.message_callback_add(topic, lambda client, userdata, data: self.__log_topic_data(topic, client, userdata, data, extractor_key))
+        return self
 
     @staticmethod
     def __log_topic_data(topic: str, client: mqtt.Client, _userdata: Any, data: MQTTMessage, extractor_key: str = ""):
@@ -51,11 +52,8 @@ class Harvester:
         except Exception as _:
             print(data.payload.decode("utf-8"))
 
-    def test_run_mqtt(self, config: MqttConfig):
-        pass
-
     def connect(self) -> Self:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.DEBUG)
         self.__mqtt.enable_logger()
         self.__mqtt.connect(host= self.__mqtt_config.host, port=self.__mqtt_config.port)
         self.__connected = True
